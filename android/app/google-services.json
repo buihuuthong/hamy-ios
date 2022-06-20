@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "7754499649",
+    "project_id": "hamy-travel-test",
+    "storage_bucket": "hamy-travel-test.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:7754499649:android:1b95943c551a8a8f5728c0",
+        "android_client_info": {
+          "package_name": "com.hamytravel"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "7754499649-2j5gup9qvi47nb0jq52q8tjothfd9jut.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.hamytravel",
+            "certificate_hash": "5e8f16062ea3cd2c4a0d547876baa6f38cabf625"
+          }
+        },
+        {
+          "client_id": "7754499649-cvlma66ue7ta3ujfn94duu9s1mimugsg.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBNstOzVvFaySM2-1nSVvzBiSZsJts6P2g"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "7754499649-cvlma66ue7ta3ujfn94duu9s1mimugsg.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CLIENT_ID</key>
+	<string>948569738042-iam070eg0qi4e6e0q8qt2dc3g0vaff1p.apps.googleusercontent.com</string>
+	<key>REVERSED_CLIENT_ID</key>
+	<string>com.googleusercontent.apps.948569738042-iam070eg0qi4e6e0q8qt2dc3g0vaff1p</string>
+	<key>ANDROID_CLIENT_ID</key>
+	<string>948569738042-rkjmvnmktf963spg7v6p5070lmu91gil.apps.googleusercontent.com</string>
+	<key>API_KEY</key>
+	<string>AIzaSyD7xrk0n9OftDDlEjakW96SlGI63IPA_O8</string>
+	<key>GCM_SENDER_ID</key>
+	<string>948569738042</string>
+	<key>PLIST_VERSION</key>
+	<string>1</string>
+	<key>BUNDLE_ID</key>
+	<string>com.hamytravel.apptravle</string>
+	<key>PROJECT_ID</key>
+	<string>hamy-travel-production</string>
+	<key>STORAGE_BUCKET</key>
+	<string>hamy-travel-production.appspot.com</string>
+	<key>IS_ADS_ENABLED</key>
+	<false></false>
+	<key>IS_ANALYTICS_ENABLED</key>
+	<false></false>
+	<key>IS_APPINVITE_ENABLED</key>
+	<true></true>
+	<key>IS_GCM_ENABLED</key>
+	<true></true>
+	<key>IS_SIGNIN_ENABLED</key>
+	<true></true>
+	<key>GOOGLE_APP_ID</key>
+	<string>1:948569738042:ios:26dd086d08bf2207afde03</string>
+</dict>
+</plist>
