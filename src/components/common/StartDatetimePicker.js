@@ -14,8 +14,8 @@ const StartDatetimePicker = ({firsValue, hideDatePicker, visible, parentCallback
     const currentDate = selectedDate || date;
     setDate(currentDate);
     setText(moment(currentDate).format(`DD/MM/yyyy | HH:mm`))
-    parentCallback(moment(date).format(`YYYY-MM-DDTHH:mm:ss`))
-    formatDate(new Date(date).toLocaleString())
+    parentCallback(moment(currentDate).format(`YYYY-MM-DDTHH:mm:ss`))
+    formatDate(new Date(currentDate).toLocaleString())
   };
   return (
     <View>

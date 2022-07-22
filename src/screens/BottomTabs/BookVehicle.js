@@ -27,6 +27,7 @@ import {firebase} from '@react-native-firebase/auth';
 import axios from 'axios';
 import moment from 'moment';
 import {END_POINT_API} from '../../constants/endPoints';
+import dayjs from 'dayjs';
 
 const BookVehicle = ({route, navigation}) => {
   const [checked, setChecked] = useState('first');
@@ -35,9 +36,9 @@ const BookVehicle = ({route, navigation}) => {
   const [dataVehicle, setDataVehicle] = useState([]);
   const [fromLocation, setFromLocation] = useState('');
   const [toLocation, setToLocation] = useState('');
-  const [fromDate, setFromDate] = useState(new Date());
+  const [fromDate, setFromDate] = useState('');
   const [toDate, setToDate] = useState('');
-  const [FfoDate, setFfoDate] = useState(new Date());
+  const [FfoDate, setFfoDate] = useState('');
   const [FtoDate, setFtoDate] = useState('');
   const [fromLat, setFromLat] = useState(null);
   const [fromLng, setFromLng] = useState(null);
@@ -227,16 +228,8 @@ const BookVehicle = ({route, navigation}) => {
 
   const RenderBody = () => {
     useEffect(() => {
-      if (new Date(toDate)?.getTime() - new Date(fromDate)?.getTime() < 0) {
-        setFromDate(toDate);
-        setToDate(fromDate);
-        Alert.alert(
-          'Thông báo',
-          'Chúng tôi xin phép chuyển ngày đón thành ngày về do bạn chọn ngày về nhỏ hơn ngày đến!',
-          [{text: 'OK', onPress: () => console.log('OK Pressed')}],
-        );
-      }
-    }, [toDate]);
+      // Không hiểu nó có tác dụng gì, nếu thiếu bị lỗi =)) maintain chịu khó nha
+    }, []);
 
     useEffect(() => {
       if (item) {
@@ -526,9 +519,13 @@ const BookVehicle = ({route, navigation}) => {
                 <Text style={{color: 'red', marginLeft: 25, marginTop: 5}}>
                   * Vui lòng chọn ngày đi
                 </Text>
-              ) : new Date(FfoDate)?.getHours() - new Date().getHours() < 1 ? (
+              ) : new Date(fromDate)?.getHours() - new Date().getHours() < 1 ? (
                 <Text style={{color: 'red', marginLeft: 25, marginTop: 5}}>
                   * Chỉ được đặt xe trước giờ khởi hành 1 - 2 tiếng
+                </Text>
+              ) : dayjs(fromDate).format('DD') - dayjs(new Date()).format('DD') < 0 ? (
+                <Text style={{color: 'red', marginLeft: 25, marginTop: 5}}>
+                  * Vui lòng chọn ngày đi lớn hơn hoặc bằng ngày hiện tại
                 </Text>
               ) : null}
             </View>
@@ -593,9 +590,13 @@ const BookVehicle = ({route, navigation}) => {
                 <Text style={{color: 'red', marginLeft: 25, marginTop: 5}}>
                   * Vui lòng chọn ngày đi
                 </Text>
-              ) : new Date(FfoDate)?.getHours() - new Date().getHours() < 1 ? (
+              ) : new Date(fromDate)?.getHours() - new Date().getHours() < 1 ? (
                 <Text style={{color: 'red', marginLeft: 25, marginTop: 5}}>
                   * Chỉ được đặt xe trước giờ khởi hành 1 - 2 tiếng
+                </Text>
+              ) : dayjs(fromDate).format('DD') - dayjs(new Date()).format('DD') < 0 ? (
+                <Text style={{color: 'red', marginLeft: 25, marginTop: 5}}>
+                  * Vui lòng chọn ngày đi lớn hơn hoặc bằng ngày hiện tại
                 </Text>
               ) : null}
             </View>
@@ -650,12 +651,11 @@ const BookVehicle = ({route, navigation}) => {
                 <Text style={{color: 'red', marginLeft: 25, marginTop: 5}}>
                   * Vui lòng chọn ngày về
                 </Text>
-              ) : new Date(toDate)?.getTime() - new Date().getTime() < 0 ? (
+              ) : dayjs(toDate).format('DD') - dayjs(new Date()).format('DD') < 1 ? (
                 <Text style={{color: 'red', marginLeft: 25, marginTop: 5}}>
                   * Vui lòng chọn ngày về lớn hơn hiện tại
                 </Text>
-              ) : new Date(toDate)?.getTime() - new Date(fromDate)?.getTime() <
-                0 ? (
+              ) : dayjs(toDate).format('DD') - dayjs(fromDate).format('DD') <= 0 ? (
                 <Text style={{color: 'red', marginLeft: 25, marginTop: 5}}>
                   * Vui lòng chọn ngày về lớn hơn ngày đi
                 </Text>
@@ -663,54 +663,6 @@ const BookVehicle = ({route, navigation}) => {
             </View>
           </View>
         )}
-
-        {/* choose service */}
-        {/* <View
-            style={{
-              justifyContent: 'center',
-              alignItems: 'center',
-              marginTop: 10
-            }}>
-            <TouchableOpacity
-              style={styles.dateTimeWrapper}
-              // onPress={}
-            >
-              <View style={styles.dateTimeWrapperCalendar}>
-                <Image
-                  style={styles.dateTimeCalendar}
-                  source={icons.service_client}
-                />
-              </View>
-              <View style={{flex: 0.95}}>
-                <Text 
-                  style={{
-                    color: COLORS.black,
-                    fontSize: 14,
-                    marginLeft: 20,
-                    fontWeight: '400'
-                  }}
-                >
-                  {selectedValue}
-                </Text>
-              </View>
-              <View style={styles.dateTimeChevronWrapper}>
-                <Image
-                  source={icons.sort_down}
-                  style={styles.dateTimeChevron}
-                />
-              </View>
-            </TouchableOpacity>
-            <View style={{
-              width: '100%'
-            }}>
-              {
-                fromDate == '' &&  validate? 
-                <Text style={{color: 'red', marginLeft: 25, marginTop: 5}}>*Vui lòng chọn ngày đi</Text>
-                :
-                null
-              }
-            </View>
-          </View> */}
 
         {/* //----------book car-----------// */}
 
@@ -751,42 +703,6 @@ const BookVehicle = ({route, navigation}) => {
                         flexDirection: 'row',
                         alignItems: 'center',
                       }}>
-                      {/* <View style={styles.bookCarWrapperBook}>
-                        <TouchableOpacity
-                          style={[
-                            styles.bookCarWrapper,
-                            {
-                              alignItems: 'center',
-                              justifyContent: 'center',
-                            },
-                          ]}>
-                          <View
-                            style={{
-                              width: 60,
-                              height: 60,
-                              marginTop: 20,
-                            }}>
-                            <Image
-                              style={{
-                                width: '100%',
-                                height: '100%',
-                                resizeMode: 'cover',
-                                tintColor: COLORS.combobox,
-                              }}
-                              source={images.plus}
-                            />
-                          </View>
-
-                          <Text
-                            style={{
-                              fontSize: SIZES.h2,
-                              color: COLORS.combobox,
-                              marginTop: 20,
-                            }}>
-                            Xe khác
-                          </Text>
-                        </TouchableOpacity>
-                      </View> */}
                     </View>
                   );
                 }
@@ -845,10 +761,12 @@ const BookVehicle = ({route, navigation}) => {
                 fromDate == '' ||
                 choosenCar.quantity == 0 ||
                 myItem.distance == '0 m' ||
-                new Date(FfoDate)?.getHours() - new Date().getHours() < 1 ||
-                new Date(toDate)?.getTime() - new Date().getTime() < 0
+                new Date(FfoDate)?.getHours() - new Date().getHours() < 1 ||                
+                dayjs(FfoDate).format('DD') - dayjs(new Date()).format('DD') < 0 ||
+                dayjs(toDate).format('DD') - dayjs(new Date()).format('DD') < 1 ||
+                dayjs(toDate).format('DD') - dayjs(fromDate).format('DD') <= 0
+
               ) {
-                console.log('ok1');
                 setValidate(true);
               } else {
                 setValidate(false);

@@ -13,7 +13,7 @@ const EndDatetimePicker = ({firsValue, hideDatePicker, visible, parentCallback, 
     const currentDate = selectedDate || date;
     setDate(currentDate);
     setText(moment(currentDate).format(`DD/MM/yyyy | HH:mm`))
-    parentCallback(moment(date).format(`YYYY-MM-DDTHH:mm:ss`))
+    parentCallback(moment(currentDate).format(`YYYY-MM-DDTHH:mm:ss`))
   };
   return (
     <View>
