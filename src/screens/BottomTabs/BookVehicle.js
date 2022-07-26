@@ -267,6 +267,58 @@ const BookVehicle = ({route, navigation}) => {
       }
     };
 
+    const onChooseFrom = () => {
+      if (toLocation !== '' && fromLocation !== '') {
+        navigation.navigate('ChooseLocationOnMap', {
+          toLocation,
+          fromLocation,
+          toLat,
+          toLng,
+          fromLat,
+          fromLng,
+          distance: myItem.distance,
+          isTextInput: 'fromInput',
+        });
+      } else {
+        navigation.navigate('ChooseLocationOnMap', {
+          toLocation: '',
+          fromLocation: '',
+          toLat: 0,
+          toLng: 0,
+          fromLat: 0,
+          fromLng: 0,
+          distance: '',
+          isTextInput: 'fromInput',
+        });
+      }
+    };
+
+    const onChooseTo = () => {
+      if (toLocation !== '' && fromLocation !== '') {
+        navigation.navigate('ChooseLocationOnMap', {
+          toLocation,
+          fromLocation,
+          toLat,
+          toLng,
+          fromLat,
+          fromLng,
+          distance: myItem.distance,
+          isTextInput: 'toInput',
+        });
+      } else {
+        navigation.navigate('ChooseLocationOnMap', {
+          toLocation: '',
+          fromLocation: '',
+          toLat: 0,
+          toLng: 0,
+          fromLat: 0,
+          fromLng: 0,
+          distance: '',
+          isTextInput: 'toInput',
+        });
+      }
+    };
+
     const getVehicle = () => {
       firebase.auth().onAuthStateChanged(function (user) {
         if (user) {
@@ -351,8 +403,8 @@ const BookVehicle = ({route, navigation}) => {
                 labelValue={fromLocation}
                 editable={false}
                 isEmpty={true}
-                pointerEvents="none"
-                myOnPress={() => onFocus()}
+                pointerEvents="none"                
+                myOnPress={() => onChooseFrom()}
               />
             </TouchableOpacity>
             <TouchableOpacity
@@ -372,7 +424,7 @@ const BookVehicle = ({route, navigation}) => {
                 editable={false}
                 isEmpty={true}
                 pointerEvents="none"
-                myOnPress={() => onFocus()}
+                myOnPress={() => onChooseTo()}
               />
             </TouchableOpacity>
             <View
@@ -519,7 +571,8 @@ const BookVehicle = ({route, navigation}) => {
                 <Text style={{color: 'red', marginLeft: 25, marginTop: 5}}>
                   * Vui lòng chọn ngày đi
                 </Text>
-              ) : new Date(fromDate)?.getHours() - new Date().getHours() < 1 ? (
+              ) : new Date(fromDate)?.getHours() - new Date().getHours() < 1 &&
+              new Date(fromDate)?.getDate() - new Date().getDate() < 1? (
                 <Text style={{color: 'red', marginLeft: 25, marginTop: 5}}>
                   * Chỉ được đặt xe trước giờ khởi hành 1 - 2 tiếng
                 </Text>
@@ -590,7 +643,8 @@ const BookVehicle = ({route, navigation}) => {
                 <Text style={{color: 'red', marginLeft: 25, marginTop: 5}}>
                   * Vui lòng chọn ngày đi
                 </Text>
-              ) : new Date(fromDate)?.getHours() - new Date().getHours() < 1 ? (
+              ) : new Date(fromDate)?.getHours() - new Date().getHours() < 1 &&
+              new Date(fromDate)?.getDate() - new Date().getDate() < 1? (
                 <Text style={{color: 'red', marginLeft: 25, marginTop: 5}}>
                   * Chỉ được đặt xe trước giờ khởi hành 1 - 2 tiếng
                 </Text>
@@ -761,7 +815,8 @@ const BookVehicle = ({route, navigation}) => {
                 fromDate == '' ||
                 choosenCar.quantity == 0 ||
                 myItem.distance == '0 m' ||
-                new Date(FfoDate)?.getHours() - new Date().getHours() < 1 ||                
+                new Date(fromDate)?.getHours() - new Date().getHours() < 1 &&
+                new Date(fromDate)?.getDate() - new Date().getDate() < 1 ||                
                 dayjs(FfoDate).format('DD') - dayjs(new Date()).format('DD') < 0 ||
                 dayjs(toDate).format('DD') - dayjs(new Date()).format('DD') < 1 ||
                 dayjs(toDate).format('DD') - dayjs(fromDate).format('DD') <= 0

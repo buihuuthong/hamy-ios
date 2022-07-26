@@ -59,13 +59,12 @@ const CarInformation = ({route, navigation}) => {
   }, [myitem]);
 
   function formatCash(str) {
-    const newStr = str
-      .split('')
-      .reverse()
-      .reduce((prev, next, index) => {
-        return (index % 3 ? next : next + ',') + prev;
-      });
-    return newStr + ' đ';
+    if (!str && str !== 0) {
+      return '';
+    }
+    return Math.round(parseFloat(str?.toString()?.replace(/[^0-9]/g, '')))
+      .toString()
+      .replace(/\B(?=(\d{3})+(?!\d))/g, '.');
   }
 
   const RenderBody = () => {
@@ -172,16 +171,16 @@ const CarInformation = ({route, navigation}) => {
                   </Text>
                   <Text style={styles.totalPriceValueItem}>
                     {myPrice.discount
-                      ? formatCash(`${myPrice.discount}`)
-                      : '0đ'}
+                      ? formatCash(`${myPrice.discount}`) + ' đ'
+                      : '0 đ'}
                   </Text>
                 </View>
                 <View style={styles.totalPriceTotal}>
                   <Text style={styles.totalPriceKeyTotal}>Thành tiền</Text>
                   <Text style={styles.totalPriceValueTotal}>
                     {myPrice.finalPrice
-                      ? formatCash(`${myPrice.finalPrice}`)
-                      : '0đ'}
+                      ? formatCash(`${myPrice.finalPrice}`) + ' đ'
+                      : '0 đ'}
                   </Text>
                 </View>
               </View>

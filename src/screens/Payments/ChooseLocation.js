@@ -253,7 +253,7 @@ const ChooseLocation = ({route, navigation}) => {
           }}>
           {clickOneTime ? (
             <Text style={{color: 'red', marginTop: 5, marginLeft: 30}}>
-              *Vui nhấn 1 lần nữa để xác nhận
+              *Vui lòng nhấn 1 lần nữa để xác nhận
             </Text>
           ) : null}
         </View>

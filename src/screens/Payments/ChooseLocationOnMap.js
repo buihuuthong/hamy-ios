@@ -94,7 +94,7 @@ const Map = ({route, navigation}) => {
       <View style={styles.bodyContainer}>
         <View style={styles.chooseLocation}>
           <View style={[styles.chooseLocationCenter, {flex: 0.9}]}>
-            <TouchableOpacity style={{zIndex: 1}}>
+            <View style={{zIndex: 1}}>
               <InputVehicle
                 placeholderText="Chọn điểm đi/đến"
                 style={{
@@ -107,7 +107,7 @@ const Map = ({route, navigation}) => {
                 editable={false}
                 isEmpty={true}
               />
-            </TouchableOpacity>
+            </View>
           </View>
         </View>
       </View>

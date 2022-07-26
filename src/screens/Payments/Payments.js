@@ -32,13 +32,12 @@ const Payments = ({route, navigation}) => {
   const [loader, setLoader] = useState(false);
 
   function formatCash(str) {
-    const newStr = str
-      .split('')
-      .reverse()
-      .reduce((prev, next, index) => {
-        return (index % 3 ? next : next + ',') + prev;
-      });
-    return newStr + ' đ';
+    if (!str && str !== 0) {
+      return '';
+    }
+    return Math.round(parseFloat(str?.toString()?.replace(/[^0-9]/g, '')))
+      .toString()
+      .replace(/\B(?=(\d{3})+(?!\d))/g, '.');
   }
 
   function postOrder() {
@@ -416,13 +415,13 @@ const Payments = ({route, navigation}) => {
                 <View style={styles.paymentsItem}>
                   <Text style={styles.paymentsKeyItem}>Số tiền được giảm</Text>
                   <Text style={styles.paymentsValueItem}>
-                    {formatCash(`${myitem.discount}`)}
+                    {formatCash(`${myitem.discount}`)} đ
                   </Text>
                 </View>
                 <View style={styles.paymentsTotal}>
                   <Text style={styles.paymentsKeyTotal}>Thành tiền</Text>
                   <Text style={styles.paymentsValueTotal}>
-                    {formatCash(`${myitem.finalPrice}`)}
+                    {formatCash(`${myitem.finalPrice}`)} đ
                   </Text>
                 </View>
                 <View style={styles.paymentsItem}>
