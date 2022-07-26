@@ -21,6 +21,7 @@ const Account = ({navigation}) => {
   const {user, logout} = useContext(AuthContext);
   const [userName, setUserName] = useState('');
   const [modalVisible, setModalVisible] = useState(false);
+  const [modalDelete, setmodalDelete] = useState(false);
 
   useFocusEffect(
     React.useCallback(() => {
@@ -77,15 +78,20 @@ const Account = ({navigation}) => {
             <IonIcon name="chevron-forward-outline" style={styles.nextIcon} />
           </View>
         </TouchableOpacity>
-        {/* <TouchableOpacity style={styles.button}>
-                    <View style={styles.right}>
-                        <IonIcon name="headset-outline" style={styles.menuIcon}/>
-                        <Text style={styles.menuText}>Hỗ trợ</Text>
-                    </View>
-                    <View>
-                        <IonIcon name='chevron-forward-outline' style={styles.nextIcon} />
-                    </View>
-                </TouchableOpacity> */}
+        <TouchableOpacity
+          onPress={() => setmodalDelete(true)}
+          style={styles.button}>
+          <View style={styles.right}>
+            <IonIcon
+              name="close-circle-outline"
+              style={[styles.menuIcon, {color: 'red'}]}
+            />
+            <Text style={styles.menuText}>Xóa tài khoản</Text>
+          </View>
+          <View>
+            <IonIcon name="chevron-forward-outline" style={styles.nextIcon} />
+          </View>
+        </TouchableOpacity>
         <TouchableOpacity
           onPress={() => setModalVisible(true)}
           style={styles.button}>
@@ -127,6 +133,39 @@ const Account = ({navigation}) => {
                 style={styles.boxModal}
                 onPress={() => logout()}>
                 <Text style={styles.confirm}>Có</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
+
+      <Modal
+        animationType="fade"
+        transparent={true}
+        visible={modalDelete}
+        onRequestClose={() => {
+          setmodalDelete(!modalDelete);
+        }}>
+        <View style={styles.centeredView}>
+          <View style={[styles.modalView, { borderColor: 'red'}]}>
+            <View style={styles.headerModal}>
+              <Text style={styles.cancelFlight}>
+                Xác nhận xóa tài khoản
+              </Text>
+            </View>
+            <View style={styles.line1} />
+            <View style={styles.bottomButtonView}>
+              <TouchableOpacity
+                onPressIn={() => setmodalDelete(!modalDelete)}
+                style={styles.boxModal}>
+                <Text style={styles.cancel}>Huỷ</Text>
+              </TouchableOpacity>
+              <View style={styles.line2} />
+              <TouchableOpacity
+                style={styles.boxModal}
+                onPress={() => setmodalDelete(!modalDelete)}
+              >
+                <Text style={[styles.confirm, { color: 'red'}]}>Xác nhận</Text>
               </TouchableOpacity>
             </View>
           </View>
