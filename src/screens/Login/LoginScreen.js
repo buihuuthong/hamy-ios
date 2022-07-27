@@ -9,6 +9,8 @@ import {
   StyleSheet,
   Dimensions,
   ActivityIndicator,
+  Modal,
+  BackHandler
 } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import auth from '@react-native-firebase/auth';
@@ -23,6 +25,7 @@ const LoginScreen = ({navigation}) => {
   const [confirm, setConfirm] = useState(null);
   const [code, setCode] = useState('');
   const [errorCode, setErrorCode] = useState(false);
+  const [modalVisible, setModalVisible] = useState(false);
 
   let textInput = useRef(null);
   const lengthInput = 6;
@@ -32,18 +35,26 @@ const LoginScreen = ({navigation}) => {
   };
 
   const signInWithPhoneNumber = async () => {
-    const confirmation = await auth().signInWithPhoneNumber(
+    try {
+      const confirmation = await auth().signInWithPhoneNumber(
       number > 1 ? '+84' + number : '+840' + number,
     );
     setConfirm(confirmation);
     // loginAPI();
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   async function confirmCode() {
     try {
       await confirm.confirm(code);
     } catch (error) {
+      console.log(error.code);
       setErrorCode(true);
+      if(error.code === 'auth/user-disabled') {
+        setModalVisible(true)
+      }
     }
   }
 
@@ -77,6 +88,15 @@ const LoginScreen = ({navigation}) => {
       }
     });
   };
+
+  const onExit = () => {
+    setModalVisible(!modalVisible)
+    setConfirm(!confirm)
+    setNumber('')
+    setCode('')
+    setErrorCode(false)
+    setIsLoading(false)
+  }
 
   if (!confirm) {
     return (
@@ -254,6 +274,36 @@ const LoginScreen = ({navigation}) => {
           </TouchableOpacity>
         </View>
       </View>
+      <Modal
+        animationType="fade"
+        transparent={true}
+        visible={modalVisible}
+        onRequestClose={() => {
+          setModalVisible(!modalVisible);
+        }}>
+        <View style={styles.centeredView}>
+          <View style={styles.modalView}>
+            <View style={styles.headerModal}>
+              <Text style={styles.cancelFlight}>
+                Tài khoản đã bị xóa
+              </Text>
+            </View>
+            <View style={styles.line1} />
+            <View style={styles.bottomButtonView}>
+              <View
+                style={styles.boxModal}>
+                {/* <Text style={styles.cancel}>Không</Text> */}
+              </View>
+              <View style={styles.line2} />
+              <TouchableOpacity
+                style={styles.boxModal}
+                onPress={() => onExit()}>
+                <Text style={styles.confirm}>Xác nhận</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
     </SafeAreaView>
   );
 };
@@ -398,6 +448,68 @@ const styles = StyleSheet.create({
   textConfirm: {
     fontSize: 18,
     color: '#fff',
+    fontWeight: 'bold',
+  },
+
+  //-----Modal----//
+  centeredView: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(33, 33, 33, 0.9)',
+  },
+  modalView: {
+    width: '70%',
+    backgroundColor: 'white',
+    borderRadius: 10,
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5,
+    borderWidth: 0.5,
+  },
+  cancelFlight: {
+    color: '#000',
+    fontWeight: 'bold',
+    fontSize: 16,
+  },
+  headerModal: {
+    padding: 20,
+  },
+  bottomButtonView: {
+    width: '100%',
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  boxModal: {
+    width: '50%',
+  },
+  line1: {
+    width: '100%',
+    height: 2,
+    backgroundColor: 'grey',
+  },
+  cancel: {
+    color: 'grey',
+    alignSelf: 'center',
+    fontSize: 16,
+    padding: 5,
+  },
+  line2: {
+    width: 2,
+    height: '100%',
+    backgroundColor: 'grey',
+  },
+  confirm: {
+    color: '#6c63ff',
+    alignSelf: 'center',
+    fontSize: 16,
+    padding: 5,
     fontWeight: 'bold',
   },
 });

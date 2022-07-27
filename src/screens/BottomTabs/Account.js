@@ -10,7 +10,7 @@ import {
 } from 'react-native';
 import {AuthContext} from '../../navigation/AuthProvider';
 import IonIcon from 'react-native-vector-icons/Ionicons';
-import {firebase} from '@react-native-firebase/auth';
+import auth,{firebase} from '@react-native-firebase/auth';
 import axios from 'axios';
 import {useFocusEffect} from '@react-navigation/native';
 
@@ -46,6 +46,30 @@ const Account = ({navigation}) => {
       });
     }),
   );
+
+  const deleteUser = () => {
+    firebase.auth().onAuthStateChanged(function (user) {
+      if (user) {
+        user.getIdToken().then(function (idToken) {
+          // <------ Check this line
+          console.log("Id Token: ", idToken);
+          axios
+            .put(`${END_POINT_API}users/disable`,{}, {
+              headers: {
+                Authorization: `Bearer ${idToken}`,
+              },
+            })
+            .then(function (res) {
+              console.log('success');
+              auth().signOut()
+            })
+            .catch(function (err) {
+              console.log(err.response.data.code);
+            });
+        });
+      }
+    });
+  }
 
   return (
     <SafeAreaView style={styles.container}>
@@ -163,7 +187,7 @@ const Account = ({navigation}) => {
               <View style={styles.line2} />
               <TouchableOpacity
                 style={styles.boxModal}
-                onPress={() => setmodalDelete(!modalDelete)}
+                onPress={() => deleteUser()}
               >
                 <Text style={[styles.confirm, { color: 'red'}]}>Xác nhận</Text>
               </TouchableOpacity>
