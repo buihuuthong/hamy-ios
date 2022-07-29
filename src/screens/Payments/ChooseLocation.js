@@ -1,4 +1,4 @@
-import React, {useCallback, useEffect, useState} from 'react';
+import React, {useCallback, useEffect, useState, useRef} from 'react';
 import {
   Image,
   StyleSheet,
@@ -8,14 +8,9 @@ import {
   FlatList,
 } from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
-import { debounce } from "lodash";
-import {
-  InputVehicle,
-  LocationToFrom,
-  Button,
-  Header,
-} from '../../components';
-import { ActivityIndicator } from 'react-native-paper'
+import {debounce} from 'lodash';
+import {InputVehicle, LocationToFrom, Button, Header} from '../../components';
+import {ActivityIndicator} from 'react-native-paper';
 
 import {COLORS, icons, images, SIZES} from '../../constants';
 import axios from 'axios';
@@ -24,39 +19,96 @@ const ChooseLocation = ({route, navigation}) => {
   const [showModalSearch, setShowModalSearch] = useState(false);
   const [fromLocation, setFromLocation] = useState('');
   const [toLocation, setToLocation] = useState('');
+  const [distance, setDistance] = useState();
   const [result, setResult] = useState([]);
   const [fromFocus, setFromFocus] = useState(false);
   const [toFocus, setToFocus] = useState(false);
   const [validate, setValidate] = useState(false);
-  const [myItem, setMyItem] = useState({}) 
+  const [myItem, setMyItem] = useState({});
   const [clickOneTime, setClickOnceTime] = useState(false);
-  const [loader, setLoader] = useState(false)
+  const [loader, setLoader] = useState(false);
 
   useEffect(() => {
     const newItem = route.params;
     console.log('newItem', newItem);
     setMyItem(newItem);
-    if(newItem){
+    if (newItem) {
       setFromLocation(newItem.fromLocation);
       setToLocation(newItem.toLocation);
+      setDistance(newItem.distance)
     }
-  }, [])
+  }, []);
+
+  const callMyDistance = () => {
+    if (
+      myItem.fromLat !== 0 &&
+      myItem.fromLng !== 0 &&
+      myItem.toLat !== 0 &&
+      myItem.toLng !== 0
+    ) {
+      console.log('caculate distance!');
+      axios
+        .get('https://rsapi.goong.io/DistanceMatrix', {
+          params: {
+            origins: `${myItem.fromLat},${myItem.fromLng}`,
+            destinations: `${myItem.toLat},${myItem.toLng}`,
+            vehicle: 'car',
+            api_key: 'ey43gSeqDkJBv39eLDzpGQrY9V86S2cb2ITuBc5l',
+          },
+        })
+        .then(response => {
+          const myRes = response.data.rows[0].elements[0].distance.text;
+          console.log("myRes 1: ",myRes);
+          myItem.distance = myRes;
+          console.log("myRes 2: ",myRes.slice(-2));
+          if (myRes.slice(-2) == 'km') {
+            console.log("myRes 3: ",myRes);
+            setValidate(false);
+            navigation.navigate('BookVehicle', {
+              toLocation,
+              fromLocation,
+              fromLat: myItem.fromLat,
+              fromLng: myItem.fromLng,
+              toLat: myItem.toLat,
+              toLng: myItem.toLng,
+              distance: myRes,
+            });
+            console.log("distance ne: ", myItem.distance);
+          } else {
+            console.log("myRes 4: ",myRes);
+            setValidate(false);
+            navigation.navigate('BookVehicle', {
+              toLocation,
+              fromLocation,
+              fromLat: myItem.fromLat,
+              fromLng: myItem.fromLng,
+              toLat: myItem.toLat,
+              toLng: myItem.toLng,
+              distance: (parseInt(myRes) / 1000).toString() + ' km',
+            });
+          }
+        })
+        .catch(function (err) {
+          console.log('err: ', err.message);
+        });
+    } else console.log('distance error!');
+  };
 
   const RenderBody = () => {
     const [isFromEmpty, setIsFromEmpty] = useState(true);
     const [isToEmpty, setIsToEmpty] = useState(true);
     function fromOnFocus() {
       setShowModalSearch(true);
-      setFromFocus(true)
-      setToFocus(false)
+      setFromFocus(true);
+      setToFocus(false);
     }
 
     function fromOnBlur() {
       setShowModalSearch(false);
-      setFromFocus(false)
-      setToFocus(true)
-      setIsFromEmpty(true)
-      if(!myItem.fromLat && result !== []){ 
+      setFromFocus(false);
+      setToFocus(true);
+      setIsFromEmpty(true);
+      if (!myItem.fromLat && result !== []) {
         setFromLocation(result[0]?.description);
         callToSetFromLatLng(result[0]?.place_id);
       }
@@ -64,115 +116,121 @@ const ChooseLocation = ({route, navigation}) => {
 
     function toOnFocus() {
       setShowModalSearch(true);
-      setFromFocus(false)
-      setToFocus(true)
+      setFromFocus(false);
+      setToFocus(true);
     }
 
     function toOnBlur() {
       setShowModalSearch(false);
-      setFromFocus(true)
-      setToFocus(false)
-      setIsToEmpty(true)
-      if(!myItem.toLat && result !== []){ 
+      setFromFocus(true);
+      setToFocus(false);
+      setIsToEmpty(true);
+      if (!myItem.toLat && result !== []) {
         setToLocation(result[0].description);
         callToSetToLatLng(result[0].place_id);
       }
     }
-    
-    const callToSetFromLatLng = (placeId) => {
-      axios
-      .get(
-        `https://rsapi.goong.io/Place/Detail?place_id=${placeId}&api_key=ey43gSeqDkJBv39eLDzpGQrY9V86S2cb2ITuBc5l`,
-      )
-      .then((response) => {
-        const myRes = response.data
-        myItem.fromLat = myRes.result.geometry.location.lat;
-        myItem.fromLng = myRes.result.geometry.location.lng;
-        console.log('from', myItem.fromLat);
-        console.log('from', myItem.fromLng);
-      })
-      .catch(function (err) {
-        console.log('err: ', err);
-      });
-    }
 
-    const callToSetToLatLng = (placeId) => {
+    const callToSetFromLatLng = placeId => {
       axios
-      .get(
-        `https://rsapi.goong.io/Place/Detail?place_id=${placeId}&api_key=ey43gSeqDkJBv39eLDzpGQrY9V86S2cb2ITuBc5l`,
-      )
-      .then((response) => {
-        const myRes = response.data
-        myItem.toLat = myRes.result.geometry.location.lat;
-        myItem.toLng = myRes.result.geometry.location.lng;
-        
-        console.log('to', myItem.toLat);
-        console.log('to', myItem.toLng);
-      })
-      .catch(function (err) {
-        console.log('err: ', err);
-      });
-    }
-
-    const fromLocationDebounce = useCallback(debounce((text) => {
-      console.log('ok');
-      axios
-      .get(
-        `https://rsapi.goong.io/Place/AutoComplete?api_key=ey43gSeqDkJBv39eLDzpGQrY9V86S2cb2ITuBc5l&input=${text}`,
-      )
-      .then(response => {
-        const myRes = response.data.predictions;
-        myRes.map(item => {
-          setResult(response.data.predictions);
+        .get(
+          `https://rsapi.goong.io/Place/Detail?place_id=${placeId}&api_key=ey43gSeqDkJBv39eLDzpGQrY9V86S2cb2ITuBc5l`,
+        )
+        .then(response => {
+          const myRes = response.data;
+          myItem.fromLat = myRes.result.geometry.location.lat;
+          myItem.fromLng = myRes.result.geometry.location.lng;
+          console.log('from', myItem.fromLat);
+          console.log('from', myItem.fromLng);
+        })
+        .catch(function (err) {
+          console.log('err: ', err);
         });
-      })
-      .catch(function (err) {
-        console.log('this is result: ', err);
-      })
-      .finally(() => {
-        setLoader(false)
-      });
-    }, 1000), []);
+    };
+
+    const callToSetToLatLng = placeId => {
+      axios
+        .get(
+          `https://rsapi.goong.io/Place/Detail?place_id=${placeId}&api_key=ey43gSeqDkJBv39eLDzpGQrY9V86S2cb2ITuBc5l`,
+        )
+        .then(response => {
+          const myRes = response.data;
+          myItem.toLat = myRes.result.geometry.location.lat;
+          myItem.toLng = myRes.result.geometry.location.lng;
+
+          console.log('to', myItem.toLat);
+          console.log('to', myItem.toLng);
+        })
+        .catch(function (err) {
+          console.log('err: ', err);
+        });
+    };
+
+    const fromLocationDebounce = useCallback(
+      debounce(text => {
+        console.log('ok');
+        axios
+          .get(
+            `https://rsapi.goong.io/Place/AutoComplete?api_key=ey43gSeqDkJBv39eLDzpGQrY9V86S2cb2ITuBc5l&input=${text}`,
+          )
+          .then(response => {
+            const myRes = response.data.predictions;
+            myRes.map(item => {
+              setResult(response.data.predictions);
+            });
+          })
+          .catch(function (err) {
+            console.log('this is result: ', err);
+          })
+          .finally(() => {
+            setLoader(false);
+          });
+      }, 1000),
+      [],
+    );
 
     function fromLocationChange(text) {
-      setLoader(true)
+      setLoader(true);
       setFromLocation(text);
-      fromLocationDebounce(text)
-      if(text){
-        setIsFromEmpty(false)
-      }else{
-        setIsFromEmpty(true)
+      fromLocationDebounce(text);
+      if (text) {
+        setIsFromEmpty(false);
+      } else {
+        setIsFromEmpty(true);
       }
     }
 
-    const toLocationDebounce = useCallback(debounce((text) => {
-      console.log('ok');
-      axios
-      .get(
-        `https://rsapi.goong.io/Place/AutoComplete?api_key=ey43gSeqDkJBv39eLDzpGQrY9V86S2cb2ITuBc5l&input=${text}`,
-      )
-      .then(response => {
-        const myRes = response.data.predictions;
-        myRes.map(item => {
-          setResult(response.data.predictions);
-        });
-      })
-      .catch(function (err) {
-        console.log('this is result: ', err);
-      })
-      .finally(() => {
-        setLoader(false)
-      });
-    }, 1000), []);
+    const toLocationDebounce = useCallback(
+      debounce(text => {
+        console.log('ok');
+        axios
+          .get(
+            `https://rsapi.goong.io/Place/AutoComplete?api_key=ey43gSeqDkJBv39eLDzpGQrY9V86S2cb2ITuBc5l&input=${text}`,
+          )
+          .then(response => {
+            const myRes = response.data.predictions;
+            myRes.map(item => {
+              setResult(response.data.predictions);
+            });
+          })
+          .catch(function (err) {
+            console.log('this is result: ', err);
+          })
+          .finally(() => {
+            setLoader(false);
+          });
+      }, 1000),
+      [],
+    );
 
     function toLocationChange(text) {
-      setLoader(true)
+      setLoader(true);
       setToLocation(text);
       toLocationDebounce(text);
-      if(text){
-        setIsToEmpty(false)
-      }else{
-        setIsToEmpty(true)
+      if (text) {
+        setIsToEmpty(false);
+      } else {
+        setIsToEmpty(true);
       }
     }
 
@@ -274,20 +332,17 @@ const ChooseLocation = ({route, navigation}) => {
         </View>
         {/* /--------the places------/ */}
         <View>
-          {
-            loader ? 
+          {loader ? (
             <ActivityIndicator size="small" color={COLORS.secondary} />
-            :
-            null
-          }
+          ) : null}
           <FlatList
             data={result}
             renderItem={({item, index}) => {
               const handleChooseLocation = () => {
-                if (toFocus === false) {
+                if (toFocus === true) {
                   setToLocation(item.description);
                   callToSetToLatLng(item.place_id);
-                } else if (fromFocus === false) {
+                } else if (fromFocus === true) {
                   setFromLocation(item.description);
                   callToSetFromLatLng(item.place_id);
                 }
@@ -350,9 +405,10 @@ const ChooseLocation = ({route, navigation}) => {
   };
   return (
     <View style={styles.container}>
-      <SafeAreaView style={{
-        marginTop: '4%'
-      }}>
+      <SafeAreaView
+        style={{
+          marginTop: '4%',
+        }}>
         <Header
           title={'Chọn lộ trình đi'}
           onPress={() => navigation.goBack()}
@@ -381,34 +437,25 @@ const ChooseLocation = ({route, navigation}) => {
             }}>
             <Button
               buttonTitle={'Tiếp tục'}
-                onPress={() => {
-                  if(
-                    myItem.fromLat == 0 ||
-                    myItem.fromLng == 0 ||
-                    myItem.toLat == 0 ||
-                    myItem.toLng == 0
-                  ){
-                    console.log('ok1');
-                    setValidate(true);
-                    setClickOnceTime(false)
-                  }else if(
-                    myItem.fromLat != 0 &&
-                    myItem.fromLng != 0 &&
-                    myItem.toLat != 0 &&
-                    myItem.toLng != 0 
-                  ){
-                    setValidate(false)
-                    navigation.navigate('Map', {
-                      toLocation, 
-                      fromLocation,
-                      fromLat: myItem.fromLat,
-                      fromLng: myItem.fromLng,
-                      toLat: myItem.toLat,
-                      toLng: myItem.toLng,
-                      distance: ''
-                    })
-                  }
-                }}
+              onPress={() => {
+                if (
+                  myItem.fromLat == 0 ||
+                  myItem.fromLng == 0 ||
+                  myItem.toLat == 0 ||
+                  myItem.toLng == 0
+                ) {
+                  console.log('ok1');
+                  setValidate(true);
+                  setClickOnceTime(false);
+                } else if (
+                  myItem.fromLat != 0 &&
+                  myItem.fromLng != 0 &&
+                  myItem.toLat != 0 &&
+                  myItem.toLng != 0
+                ) {
+                  callMyDistance()
+                }
+              }}
             />
           </View>
         </View>

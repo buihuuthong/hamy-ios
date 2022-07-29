@@ -809,6 +809,7 @@ const BookVehicle = ({route, navigation}) => {
           <Button
             buttonTitle={'Đặt Xe'}
             onPress={() => {
+              console.log("Distance: ",item.distance);
               if (
                 fromLocation == '' ||
                 toLocation == '' ||
